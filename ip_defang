@@ -1,0 +1,28 @@
+Defanging an IP address is a process of modifying the IP address so that it is not clickable or executable in a way that could potentially cause harm if clicked accidentally. Below is a simple Python script that defangs an IP address. This script can be run on Kali Linux or any other system with Python installed.
+
+Here's a Python script that you can use to defang an IP address:
+
+```python
+import re
+
+def defang_ip(ip):
+    # Use regex to find all occurrences of IP addresses in the input string
+    defanged_ip = re.sub(r'\.', '[.]', ip)
+    return defanged_ip
+
+def main():
+    ip = input("Enter the IP address to defang: ")
+    defanged_ip = defang_ip(ip)
+    print(f"Defanged IP address: {defanged_ip}")
+
+if __name__ == "__main__":
+    main()
+```
+
+Save this script to a file, for example, `defang_ip.py`. You can then run it from the terminal on Kali Linux using the following command:
+
+```sh
+python3 defang_ip.py
+```
+
+When you run the script, it will prompt you to enter the IP address you want to defang, and it will output the defanged IP address.
