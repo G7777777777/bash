@@ -1,0 +1,70 @@
+from youtube_transcript_api import YouTubeTranscriptApi
+from transformers import pipeline
+
+# Function to fetch transcript from YouTube video ID
+def fetch_transcript(video_id):
+    """Fetch transcript using YouTube API."""
+    try:
+        transcript = YouTubeTranscriptApi.get_transcript(video_id)
+        transcript_text = "\n".join([entry['text'] for entry in transcript])
+        return transcript_text
+    except Exception as e:
+        print(f"An error occurred while fetching the transcript: {e}")
+        return None
+
+# Function to summarize text
+def summarize_text(text):
+    """Summarize text using a text summarization model."""
+    summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+    
+    # Handle long text by summarizing in chunks
+    chunk_size = 1024  # Adjust chunk size if necessary
+    chunks = list(chunk_text(text, chunk_size))
+    
+    summaries = []
+    for chunk in chunks:
+        summary = summarizer(chunk, max_length=150, min_length=30, do_sample=False)
+        summaries.append(summary[0]['summary_text'])
+    
+    return " ".join(summaries)
+
+# Function to chunk text into manageable pieces
+def chunk_text(text, chunk_size=512):
+    """Yield chunks of text of size `chunk_size`."""
+    for i in range(0, len(text), chunk_size):
+        yield text[i:i + chunk_size]
+
+# Function to save content to a file
+def save_to_file(filename, summary, transcript):
+    """Save summary and transcript to a file."""
+    try:
+        with open(filename, 'w') as file:
+            file.write("Transcript:\n")
+            file.write(transcript + "\n\n")
+            file.write("Summary:\n")
+            file.write(summary + "\n\n")
+        print(f"Content successfully saved to {filename}.")
+    except IOError as e:
+        print(f"An error occurred while saving the file: {e}")
+
+def main():
+    video_id = input("Enter the YouTube video ID: ")
+    transcript = fetch_transcript(video_id)
+    
+    if transcript:
+        print("Transcript fetched successfully.")
+        print("\nTranscript Content:\n")
+        print(transcript)  # Display the transcript for verification
+        summary = summarize_text(transcript)
+        
+        if summary:
+            print("\nSummary generated successfully.")
+            filename = input("Enter the filename to save (e.g., summary.txt): ")
+            save_to_file(filename, summary, transcript)
+        else:
+            print("Failed to generate summary.")
+    else:
+        print("Failed to fetch transcript.")
+
+if __name__ == "__main__":
+    main()
