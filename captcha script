@@ -1,0 +1,49 @@
+To generate an image CAPTCHA using Python, you can use libraries like `Pillow` (for image generation) and `random` (for generating random characters). Here's an example of a simple CAPTCHA generator script:
+
+```python
+from PIL import Image, ImageDraw, ImageFont
+import random
+import string
+
+# Function to generate a random string of letters and digits
+def generate_captcha_text(length=6):
+    characters = string.ascii_uppercase + string.digits
+    return ''.join(random.choice(characters) for _ in range(length))
+
+# Function to generate CAPTCHA image
+def generate_captcha_image(captcha_text):
+    width, height = 200, 100
+    background_color = (255, 255, 255)
+    text_color = (0, 0, 0)
+
+    # Create an image with white background
+    image = Image.new('RGB', (width, height), background_color)
+    draw = ImageDraw.Draw(image)
+
+    # Load a font (you can change the path to a font on your system)
+    font = ImageFont.truetype("arial.ttf", 48)
+
+    # Draw the captcha text onto the image
+    text_width, text_height = draw.textsize(captcha_text, font)
+    text_position = ((width - text_width) / 2, (height - text_height) / 2)
+    draw.text(text_position, captcha_text, font=font, fill=text_color)
+
+    # Save or display the CAPTCHA image
+    image.show()  # For displaying
+    image.save("captcha.png")  # For saving as a file
+
+# Generate CAPTCHA text and image
+captcha_text = generate_captcha_text()
+generate_captcha_image(captcha_text)
+print(f"CAPTCHA Text: {captcha_text}")
+```
+
+### Steps:
+1. Install `Pillow` using the command:
+   ```bash
+   pip install pillow
+   ```
+   
+2. Run the script. It generates an image with a random CAPTCHA and displays it, saving the image as `captcha.png`.
+
+This is a basic CAPTCHA. You can improve it by adding noise (lines or dots) or using different fonts for added complexity.
